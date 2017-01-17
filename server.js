@@ -4,6 +4,14 @@ var bodyParser = require('body-parser');
 var app = express();
 app.use(bodyParser.json());
 
+app.use(function(err, req, res, next) {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) 
+  {
+  	res.set("Content-Type", "application/json");
+    res.status(400).send({"error": "Could not decode request: JSON parsing failed"});
+  }
+});
+
 app.post('/', function(request, response){
 	response.set("Content-Type", "application/json");
 	var jsonObj = request.body;
@@ -35,7 +43,8 @@ app.post('/', function(request, response){
 		responseJson[keyResponse] = "Could not decode request: JSON parsing failed";
 	}
 	response.send(responseJson);
-})
+});
+
 var port = process.env.PORT || 3000;
 app.listen(port);
 console.log("Sever is up and listening on port "+port);
