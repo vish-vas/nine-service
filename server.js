@@ -4,14 +4,16 @@ var bodyParser = require('body-parser');
 var app = express();
 app.use(bodyParser.json());
 
-app.use(function(err, req, res, next) {
-  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) 
+//handle errors from malformed JSON payload provided in a request
+app.use(function(error, request, response, next) {
+  if (error instanceof SyntaxError && error.status === 400 && 'body' in error) 
   {
-  	res.set("Content-Type", "application/json");
-    res.status(400).send({"error": "Could not decode request: JSON parsing failed"});
+  	response.set("Content-Type", "application/json");
+    response.status(400).send({"error": "Could not decode request: JSON parsing failed"});
   }
 });
 
+//use post route to get the request payload and process data according to requirements/ constrains
 app.post('/', function(request, response){
 	response.set("Content-Type", "application/json");
 	var jsonObj = request.body;
